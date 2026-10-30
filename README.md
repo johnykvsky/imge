@@ -58,7 +58,11 @@ Designed for quick edits without unnecessary complexity: open, paste from clipbo
 | `Ctrl + Shift + Z` / `Ctrl + Y` | Redo |
 | `1` / `Ctrl + 0` | 100% Actual Size |
 | `F` | Fit image to window |
-| `+` / `-` or `Wheel` | Zoom In / Zoom Out (centered on cursor) |
+| `Left-Click Drag` | Draw rubber-band crop selection |
+| `Right-Click Drag` | **Pan / move image** in window |
+| `Right-Click` | Clear crop selection |
+| `Middle-Click Drag` / `Ctrl + Drag` | Pan / move image in window |
+| `+` / `-` or `Mouse Wheel` | Zoom In / Zoom Out (centered on cursor) |
 | `Right` / `Space` | Next image in directory |
 | `Left` / `Backspace` | Previous image in directory |
 

@@ -102,12 +102,14 @@ impl ImageViewer {
         let img_center = rect.center() + self.pan;
         let img_rect = Rect::from_center_size(img_center, display_size);
 
-        // Middle drag or Ctrl+Drag = Pan
-        let is_pan_drag = response.dragged_by(egui::PointerButton::Middle)
+        // Middle drag, Right drag, or Ctrl+Left Drag = Pan
+        let is_pan_drag = response.dragged_by(egui::PointerButton::Secondary)
+            || response.dragged_by(egui::PointerButton::Middle)
             || (response.dragged_by(egui::PointerButton::Primary) && ui.input(|i| i.modifiers.ctrl));
 
         if is_pan_drag {
             self.pan += response.drag_delta();
+            ui.ctx().set_cursor_icon(egui::CursorIcon::Grabbing);
         } else if response.drag_started_by(egui::PointerButton::Primary) {
             if let Some(pos) = response.interact_pointer_pos() {
                 self.is_selecting = true;

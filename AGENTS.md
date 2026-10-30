@@ -44,7 +44,7 @@ imge/
 - `src/viewer.rs`:
   - Canvas rendering using `egui::Painter`.
   - Implements rubber-band drag selection for cropping in image coordinates.
-  - Handles mouse wheel zoom towards cursor and middle-click or drag panning.
+  - Handles mouse wheel zoom towards cursor, right-click/middle-click drag panning, and rubber-band selection.
 - `src/app.rs`:
   - Orchestrates menus, toolbar, keyboard shortcuts, and status bar.
   - Integrates `arboard` for instant `Ctrl+V` clipboard pasting.
