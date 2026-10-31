@@ -17,8 +17,7 @@ imge/
 ├── README.md              # User documentation and shortcut guide
 ├── Cargo.toml             # Rust package manifest & dependencies
 ├── assets/
-│   └── icons/
-│       └── 128x128.png    # Application icon for desktop integration
+│   └── icons/             # Multi-resolution icons (16x16 up to 256x256) for window & desktop integration
 └── src/
     ├── main.rs            # Entry point & eframe native window launcher
     ├── app.rs             # Main eframe::App, menu bar, toolbar, shortcuts, drag & drop

@@ -92,11 +92,15 @@ install: release
 
 # Setup desktop shortcut, application icon, and file associations
 install-desktop: install
-	@mkdir -p $(APP_DIR) $(ICON_DIR)
-	@if [ -f assets/icons/128x128.png ]; then \
-		install -m 644 assets/icons/128x128.png $(ICON_DIR)/imge.png; \
-		echo -e "$(GREEN)Installed application icon: $(ICON_DIR)/imge.png$(RESET)"; \
-	fi
+	@mkdir -p $(APP_DIR)
+	@for size in 16x16 24x24 32x32 48x48 64x64 128x128 256x256; do \
+		if [ -f assets/icons/$$size.png ]; then \
+			mkdir -p $(PREFIX)/share/icons/hicolor/$$size/apps; \
+			install -m 644 assets/icons/$$size.png $(PREFIX)/share/icons/hicolor/$$size/apps/imge.png; \
+		fi \
+	done
+	@gtk-update-icon-cache -f -t $(PREFIX)/share/icons/hicolor 2>/dev/null || true
+	@echo -e "$(GREEN)Installed application icons to $(PREFIX)/share/icons/hicolor/...$(RESET)"
 	@printf "[Desktop Entry]\n\
 Type=Application\n\
 Name=imge\n\
@@ -128,6 +132,9 @@ associate-mime:
 uninstall:
 	@rm -f $(BIN_DIR)/imge
 	@rm -f $(APP_DIR)/imge.desktop
-	@rm -f $(ICON_DIR)/imge.png
+	@for size in 16x16 24x24 32x32 48x48 64x64 128x128 256x256; do \
+		rm -f $(PREFIX)/share/icons/hicolor/$$size/apps/imge.png; \
+	done
+	@gtk-update-icon-cache -f -t $(PREFIX)/share/icons/hicolor 2>/dev/null || true
 	@update-desktop-database $(APP_DIR) 2>/dev/null || true
-	@echo -e "$(GREEN)Removed imge binary, desktop entry, and icon.$(RESET)"
+	@echo -e "$(GREEN)Removed imge binary, desktop entry, and icons.$(RESET)"

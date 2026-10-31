@@ -32,6 +32,18 @@ fn ensure_window_focus() {
     });
 }
 
+fn load_app_icon() -> Option<egui::IconData> {
+    let icon_bytes = include_bytes!("../assets/icons/128x128.png");
+    let image = image::load_from_memory(icon_bytes).ok()?;
+    let rgba = image.to_rgba8();
+    let (width, height) = rgba.dimensions();
+    Some(egui::IconData {
+        rgba: rgba.into_raw(),
+        width,
+        height,
+    })
+}
+
 fn main() {
     let t_start = Instant::now();
     let args: Vec<String> = std::env::args().collect();
@@ -43,15 +55,21 @@ fn main() {
     let initial_path = args.get(1).map(PathBuf::from);
     let do_profile = std::env::var("IMGE_PROFILE").is_ok();
 
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_inner_size([1024.0, 720.0])
+        .with_min_inner_size([400.0, 300.0])
+        .with_title(format!("imge v{}", env!("CARGO_PKG_VERSION")))
+        .with_app_id("imge")
+        .with_active(true)
+        .with_visible(true)
+        .with_drag_and_drop(true);
+
+    if let Some(icon) = load_app_icon() {
+        viewport = viewport.with_icon(icon);
+    }
+
     let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1024.0, 720.0])
-            .with_min_inner_size([400.0, 300.0])
-            .with_title(format!("imge v{}", env!("CARGO_PKG_VERSION")))
-            .with_app_id("imge")
-            .with_active(true)
-            .with_visible(true)
-            .with_drag_and_drop(true),
+        viewport,
         ..Default::default()
     };
 
