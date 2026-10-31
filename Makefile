@@ -24,7 +24,7 @@ RESET := \033[0m
 MIME_TYPES := image/png image/jpeg image/webp image/bmp image/x-bmp image/gif image/tiff image/x-icon image/vnd.microsoft.icon
 MIME_LIST  := image/png;image/jpeg;image/webp;image/bmp;image/x-bmp;image/gif;image/tiff;image/x-icon;image/vnd.microsoft.icon;
 
-.PHONY: all help build release dev run check test clean distclean install install-desktop associate-mime uninstall
+.PHONY: all help build release dev run check test bench clean distclean install install-desktop associate-mime uninstall
 
 all: build
 
@@ -37,6 +37,7 @@ help:
 	@echo -e "  $(GREEN)make dev$(RESET)             Run debug build without arguments"
 	@echo -e "  $(GREEN)make check$(RESET)           Fast compilation verification via cargo check"
 	@echo -e "  $(GREEN)make test$(RESET)            Run test suite"
+	@echo -e "  $(GREEN)make bench$(RESET)           Run automated benchmarks (startup, memory, engine)"
 	@echo -e "  $(GREEN)make install$(RESET)         Install binary to $(BIN_DIR)/imge"
 	@echo -e "  $(GREEN)make install-desktop$(RESET) Install desktop launcher, icon, and register file associations"
 	@echo -e "  $(GREEN)make associate-mime$(RESET)  Set imge as default viewer for all supported image types"
@@ -67,6 +68,11 @@ check:
 # Test suite
 test:
 	$(CARGO) test
+
+# Automated benchmarks
+bench: release
+	@$(CARGO) build --release --bin bench_suite
+	@python3 bench/run_benchmarks.py
 
 # Clean cargo cache
 clean:

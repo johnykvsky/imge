@@ -4,7 +4,7 @@ Welcome to **imge**, a fast, lightweight image manipulation and viewing desktop 
 
 ## 1. Project Philosophy & Scope
 - **Minimal, Fast, and Focused**: No layer stacks, no complex vector/brush drawing tools.
-- **Single-Image Workflow**: Open, paste from clipboard, crop, resize, rotate/flip, and export across common formats (PNG, JPEG, WebP, BMP, TIFF).
+- **Single-Image Workflow**: Open, paste from clipboard, crop, resize, rotate/flip, and export across common formats (PNG, JPEG, WebP, GIF, BMP, TIFF).
 - **Keyboard-Driven**: IrfanView-inspired single-key and standard modifier shortcuts (`Ctrl+V` to paste, `Ctrl+R` to resize, `Ctrl+S` to save, `R`/`L` to rotate, `H`/`V` to flip, `Ctrl+Z` to undo, `Esc` to close).
 - **Native Binary**: Direct native ELF binary with instant startup (<50ms) and minimal RAM footprint.
 
@@ -70,6 +70,10 @@ imge/
 - Run unit tests:
   ```bash
   make test         # Or: cargo test
+  ```
+- Run benchmarks:
+  ```bash
+  make bench        # Runs automated startup, memory, and engine benchmarks
   ```
 - Clean build cache and artifacts:
   ```bash

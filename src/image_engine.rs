@@ -2,9 +2,9 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::{Path, PathBuf};
 use eframe::egui;
-use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageFormat, RgbaImage};
+use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageFormat};
 
-const MAX_HISTORY: usize = 15;
+const MAX_HISTORY: usize = 3;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ResizeFilter {
@@ -356,9 +356,17 @@ impl ImageEngine {
 
     pub fn to_egui_image(&self) -> Option<egui::ColorImage> {
         self.current.as_ref().map(|img| {
-            let rgba: RgbaImage = img.to_rgba8();
-            let (w, h) = rgba.dimensions();
-            egui::ColorImage::from_rgba_unmultiplied([w as usize, h as usize], rgba.as_raw())
+            let (w, h) = img.dimensions();
+            let size = [w as usize, h as usize];
+            match img {
+                DynamicImage::ImageRgba8(rgba) => {
+                    egui::ColorImage::from_rgba_unmultiplied(size, rgba.as_raw())
+                }
+                _ => {
+                    let rgba = img.to_rgba8();
+                    egui::ColorImage::from_rgba_unmultiplied(size, rgba.as_raw())
+                }
+            }
         })
     }
 
@@ -532,7 +540,7 @@ fn patch_tiff_orientation(tiff: &mut [u8]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use image::Rgba;
+    use image::{Rgba, RgbaImage};
 
     fn create_test_image(w: u32, h: u32) -> DynamicImage {
         let mut img = RgbaImage::new(w, h);
@@ -608,7 +616,7 @@ mod tests {
         let mut engine = ImageEngine::new();
         engine.load_dynamic_image(create_test_image(80, 60), None);
 
-        for ext in ["png", "jpg", "webp", "bmp"] {
+        for ext in ["png", "jpg", "webp", "bmp", "gif"] {
             let path = temp_dir.join(format!("imge_test_out.{ext}"));
             let res = engine.save(&path, 90);
             assert!(res.is_ok(), "Failed saving {ext}: {:?}", res);

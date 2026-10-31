@@ -1,9 +1,10 @@
-# imge
+# imge `v0.0.2`
 
 A fast, lightweight, and easy-to-use native image viewer and manipulation application for Linux (Manjaro, Arch, Ubuntu, Fedora, etc.), built in **Rust** and inspired by IrfanView.
 
 Designed for quick edits without unnecessary complexity: open, paste from clipboard, crop, resize, rotate, flip, and export to any popular image format. No layers, no heavy drawing tools, minimal memory footprint.
 
+![Version](https://img.shields.io/badge/version-v0.0.2-brightgreen)
 ![imge](https://img.shields.io/badge/Language-Rust-orange)
 ![GUI](https://img.shields.io/badge/GUI-egui%20%2F%20eframe-blue)
 ![Engine](https://img.shields.io/badge/Engine-image--rs-green)
@@ -26,7 +27,7 @@ Designed for quick edits without unnecessary complexity: open, paste from clipbo
   - Rotate (90° CW, 180°, 90° CCW) and flip JPEG images directly in the DCT frequency domain without recompressing or losing quality.
   - Automatic EXIF orientation reset, optional `.bak` backup, and overwrite or save-as support.
 - 💾 **Multi-Format Export**:
-  - Save as PNG, JPEG, WebP, BMP, TIFF.
+  - Save as PNG, JPEG, WebP, GIF, BMP, TIFF.
   - Interactive quality slider for lossy JPEG compression.
 - ⏪ **Undo / Redo (`Ctrl+Z` / `Ctrl+Y`)**: Non-destructive history for all operations.
 - ℹ️ **Image Information & EXIF (`I`)**: View image properties (dimensions, aspect ratio, color depth, memory footprint) and detailed camera EXIF tags.

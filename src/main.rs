@@ -1,11 +1,7 @@
-mod app;
-mod dialogs;
-mod image_engine;
-mod viewer;
-
 use std::path::PathBuf;
-use app::ImgeApp;
+use std::time::Instant;
 use eframe::egui;
+use imge::app::ImgeApp;
 
 fn ensure_window_focus() {
     // Cinnamon/Muffin and X11 compositors enforce Focus Stealing Prevention (FSP)
@@ -37,13 +33,21 @@ fn ensure_window_focus() {
 }
 
 fn main() {
-    let initial_path = std::env::args().nth(1).map(PathBuf::from);
+    let t_start = Instant::now();
+    let args: Vec<String> = std::env::args().collect();
+    if args.iter().any(|arg| arg == "--version" || arg == "-v" || arg == "-V") {
+        println!("imge v{}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
+    let initial_path = args.get(1).map(PathBuf::from);
+    let do_profile = std::env::var("IMGE_PROFILE").is_ok();
 
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1024.0, 720.0])
             .with_min_inner_size([400.0, 300.0])
-            .with_title("imge")
+            .with_title(format!("imge v{}", env!("CARGO_PKG_VERSION")))
             .with_app_id("imge")
             .with_active(true)
             .with_visible(true)
@@ -53,10 +57,23 @@ fn main() {
 
     ensure_window_focus();
 
+    if do_profile {
+        eprintln!("[profile] Options prepared: {:.2} ms", t_start.elapsed().as_secs_f64() * 1000.0);
+    }
+
     let _ = eframe::run_native(
         "imge",
         native_options,
-        Box::new(|cc| Ok(Box::new(ImgeApp::new(initial_path, cc)))),
+        Box::new(move |cc| {
+            if do_profile {
+                eprintln!("[profile] eframe cc created (GL context ready): {:.2} ms", t_start.elapsed().as_secs_f64() * 1000.0);
+            }
+            let app = ImgeApp::new(initial_path, cc);
+            if do_profile {
+                eprintln!("[profile] ImgeApp::new finished: {:.2} ms", t_start.elapsed().as_secs_f64() * 1000.0);
+            }
+            Ok(Box::new(app))
+        }),
     );
 
     // Cleanly terminate process so lingering background worker threads

@@ -24,6 +24,7 @@ pub struct ImgeApp {
     status_message: String,
     needs_fit: bool,
     focus_frames: u8,
+    first_frame: bool,
 }
 
 impl ImgeApp {
@@ -41,6 +42,7 @@ impl ImgeApp {
             status_message: "Ready".to_string(),
             needs_fit: true,
             focus_frames: 20,
+            first_frame: true,
         };
 
         if let Some(path) = initial_path {
@@ -93,23 +95,36 @@ impl ImgeApp {
         if let Some(parent) = abs_path.parent() {
             if let Ok(entries) = std::fs::read_dir(parent) {
                 let mut files: Vec<PathBuf> = entries
-                    .filter_map(|e| e.ok().map(|e| e.path()))
-                    .filter(|p| {
-                        p.is_file()
-                            && p.extension()
-                                .and_then(|ext| ext.to_str())
-                                .map(|ext| SUPPORTED_EXTS.contains(&ext.to_lowercase().as_str()))
-                                .unwrap_or(false)
+                    .filter_map(|e| e.ok())
+                    .filter(|e| {
+                        let is_file = e
+                            .file_type()
+                            .map(|ft| ft.is_file() || ft.is_symlink())
+                            .unwrap_or(false);
+                        if !is_file {
+                            return false;
+                        }
+                        let p = e.path();
+                        p.extension()
+                            .and_then(|ext| ext.to_str())
+                            .map(|ext| SUPPORTED_EXTS.contains(&ext.to_lowercase().as_str()))
+                            .unwrap_or(false)
                     })
+                    .map(|e| e.path())
                     .collect();
 
                 files.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
 
-                let canon_target = abs_path.canonicalize().unwrap_or(abs_path);
-                if let Some(pos) = files.iter().position(|p| {
-                    p.canonicalize().unwrap_or_else(|_| p.clone()) == canon_target
-                }) {
-                    self.dir_index = Some(pos);
+                // Fast O(1) in-memory comparison by file_name first
+                if let Some(target_name) = abs_path.file_name() {
+                    self.dir_index = files.iter().position(|p| p.file_name() == Some(target_name));
+                }
+                // Fallback to canonical resolution only if not matched by filename (e.g. symlinks)
+                if self.dir_index.is_none() {
+                    let canon_target = abs_path.canonicalize().unwrap_or_else(|_| abs_path.clone());
+                    self.dir_index = files.iter().position(|p| {
+                        p.canonicalize().unwrap_or_else(|_| p.clone()) == canon_target
+                    });
                 }
                 self.dir_files = files;
             }
@@ -225,6 +240,7 @@ impl ImgeApp {
             .add_filter("PNG Image (*.png)", &["png"])
             .add_filter("JPEG Image (*.jpg, *.jpeg)", &["jpg", "jpeg"])
             .add_filter("WebP Image (*.webp)", &["webp"])
+            .add_filter("GIF Image (*.gif)", &["gif"])
             .add_filter("BMP Image (*.bmp)", &["bmp"])
             .add_filter("TIFF Image (*.tiff, *.tif)", &["tiff", "tif"]);
 
@@ -872,6 +888,15 @@ impl eframe::App for ImgeApp {
                         ui.close_menu();
                     }
                 });
+
+                ui.menu_button("Help", |ui| {
+                    ui.label(egui::RichText::new(format!("imge v{}", env!("CARGO_PKG_VERSION"))).strong());
+                    ui.label("A fast, lightweight image manipulation and viewing desktop app inspired by IrfanView.");
+                });
+
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    ui.label(egui::RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).weak());
+                });
             });
 
             // Quick Toolbar
@@ -994,10 +1019,17 @@ impl eframe::App for ImgeApp {
             _ => String::new(),
         };
         let title = if self.engine.has_image() {
-            format!("{mod_prefix}{}{dir_info} ({w}×{h}) - imge", self.engine.file_name())
+            format!("{mod_prefix}{}{dir_info} ({w}×{h}) - imge v{}", self.engine.file_name(), env!("CARGO_PKG_VERSION"))
         } else {
-            "imge".to_string()
+            format!("imge v{}", env!("CARGO_PKG_VERSION"))
         };
         ctx.send_viewport_cmd(egui::ViewportCommand::Title(title));
+
+        if self.first_frame {
+            self.first_frame = false;
+            if std::env::var("IMGE_PROFILE").is_ok() {
+                eprintln!("[profile] First frame update() complete");
+            }
+        }
     }
 }
