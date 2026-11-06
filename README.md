@@ -11,6 +11,10 @@ Designed for quick edits without unnecessary complexity: open, paste from clipbo
 
 ---
 
+![Listing](https://raw.githubusercontent.com/johnykvsky/imge/master/imge.jpg)
+
+---
+
 ## Features
 
 - ⚡ **Instant Startup & Native Performance**: Standalone native ELF binary with sub-50ms launch time and tiny RAM footprint (~30 MB).
