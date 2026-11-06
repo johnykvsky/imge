@@ -111,7 +111,7 @@ Icon=imge\n\
 Terminal=false\n\
 Categories=Graphics;Viewer;2DGraphics;\n\
 MimeType=$(MIME_LIST)\n\
-StartupNotify=false\n\
+StartupNotify=true\n\
 StartupWMClass=imge\n\
 Keywords=image;viewer;crop;resize;convert;photo;\n" > $(APP_DIR)/imge.desktop
 	@update-desktop-database $(APP_DIR) 2>/dev/null || true

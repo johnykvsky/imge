@@ -1397,8 +1397,10 @@ dependencies = [
  "eframe",
  "image",
  "kamadak-exif",
+ "raw-window-handle",
  "rfd",
  "turbojpeg",
+ "x11rb",
 ]
 
 [[package]]

@@ -16,6 +16,8 @@ arboard = "3.4"
 rfd = "0.15"
 kamadak-exif = "0.6.1"
 turbojpeg = { version = "1.5.1", default-features = false, features = ["pkg-config"] }
+raw-window-handle = "0.6"
+x11rb = { version = "0.13", default-features = false, features = ["dl-libxcb", "allow-unsafe-code"] }
 
 [profile.release]
 opt-level = 3
